@@ -15,10 +15,6 @@ web4b-js samples:
 * [web4b-js-samples](https://github.com/bryllite/web4b-js-sample)
 
 
-It's available on npm as a node module.
-
-[![NPM version][npm-image]][npm-url]
-
 ## Installation
 
 ### Node.js
