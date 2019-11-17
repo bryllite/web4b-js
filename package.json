@@ -1,0 +1,12 @@
+{
+  "name": "web4b",
+  "version": "0.0.4",
+  "description": "",
+  "main": "src/web4b.js",
+  "dependencies": {
+    "web3": "^1.2.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
