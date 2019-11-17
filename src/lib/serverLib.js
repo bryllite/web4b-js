@@ -4,10 +4,10 @@ var Cyprus = require('./cyprus');
 var BAuth = require("./bauth");
 var util = require("./util");
 
-var ServerLib = function ServerLib(web3) {
+var ServerLib = function ServerLib(web3, key, rAddress) {
 
-    var gameKey;
-    var retrieveAddress;
+    var gameKey = key;
+    var retrieveAddress = rAddress;
 
     var cyprus_ = new Cyprus(web3);
 

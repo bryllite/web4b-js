@@ -1,6 +1,6 @@
 {
   "name": "web4b",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "src/web4b.js",
   "dependencies": {
