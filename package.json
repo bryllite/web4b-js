@@ -1,12 +1,26 @@
 {
   "name": "web4b",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "src/web4b.js",
   "dependencies": {
     "web3": "^1.2.2"
   },
+  "scripts": {
+    "build": "webpack -w"
+  },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/polyfill": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
+    "babel-loader": "^8.0.6",
+    "core-js": "^3.4.1",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  }
 }
