@@ -137,7 +137,7 @@ var Be4 = function Be4(web3) {
     };
 
     this.CreateTransaction = async function (signer, to, value, gas, extra, nonce) {
-        var _timestamp = util.UnixTime();
+        // var _timestamp = util.UnixTime();
         var _nonce = nonce;
         var _value = web3.utils.toHex(value*100000000);
         var _gas = web3.utils.toHex(gas);
@@ -146,10 +146,15 @@ var Be4 = function Be4(web3) {
             _nonce = await this.GetTransactionCount('0x'+fromAddress, 'pending');
         }
         const privateKey = Buffer.from(signer.replace('0x',''), 'hex');
+
+        if(extra !== undefined && extra !== ""){
+            extra = util.MakeExtras(extra);
+            console.log('extra:', extra);
+        }
+                
         const txParams = {
             chainId: MainNet,
             version: '0x00',
-            timestamp: _timestamp,
             to: to,
             value: _value,
             gas: _gas,

@@ -7,9 +7,8 @@ var Cyprus = function Cyprus(web3) {
     
     const TransactionType = {
         Transfer: 0x80,
-        Payout: 0x81,
-        Issue: 0x82,
-        Burn: 0x83
+        Withdraw: 0x81,
+        Deposit: 0x82
     }
 
     web3.extend({
@@ -96,6 +95,10 @@ var Cyprus = function Cyprus(web3) {
         },{
             name: 'pendingTransactions',
             call: 'cyprus_pendingTransactions'
+        },{
+            name: 'getPoATokenSeed',
+            call: 'cyprus_getPoATokenSeed',
+            params: 2
         }]
     });
 
@@ -161,12 +164,11 @@ var Cyprus = function Cyprus(web3) {
     };
 
     this.SendPayout = async function (signer, to, value, gas, extra, nonce) {
-        var tx = await this.CreateTransaction(signer, to, value, gas, TransactionType.Payout, extra, nonce);
+        var tx = await this.CreateTransaction(signer, to, value, gas, TransactionType.Withdraw, extra, nonce);
         return await this.SendRawTransaction(tx);
     };
 
     this.CreateTransaction = async function (signer, to, value, gas, transactionType, extra, nonce) {
-        var _timestamp = util.UnixTime();
         var _nonce = nonce;
         var _value = web3.utils.toHex(value*100000000);
         var _gas = web3.utils.toHex(gas);
@@ -176,10 +178,14 @@ var Cyprus = function Cyprus(web3) {
             _nonce = rtnNonce[0];
         }
         const privateKey = Buffer.from(signer.replace('0x',''), 'hex');
+
+        if(extra !== undefined && extra !== ""){
+            extra = util.MakeExtras(extra);
+        }
+
         const txParams = {
             chainId: transactionType,
             version: '0x00',
-            timestamp: _timestamp,
             to: to,
             value: _value,
             gas: _gas,
@@ -225,6 +231,10 @@ var Cyprus = function Cyprus(web3) {
     this.GetTransactionsByUid = function (uid, isTxHash) {
         return web3.cyprus.getTransactionsByUid(uid, isTxHash);
     };
+
+    this.GetPoATokenSeed = function (timestamp, signature) {
+        return web3.cyprus.getPoATokenSeed(timestamp, signature);
+    };    
 };
 
 module.exports = Cyprus;

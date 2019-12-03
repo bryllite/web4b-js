@@ -8,6 +8,9 @@ var ServerLib = function ServerLib(web3, key, rAddress) {
 
     var gameKey = key;
     var retrieveAddress = rAddress;
+    var seed;
+    var seedTimestamp = 0;
+    var seedRefreshSec = 30;
 
     var cyprus_ = new Cyprus(web3);
 
@@ -52,6 +55,7 @@ var ServerLib = function ServerLib(web3, key, rAddress) {
 
     //payout
     this.SendPayout = async function (signer, to, value, gas, extra) {
+        var gas = 0;
         return await cyprus_.SendPayout(signer, to, value, gas, extra);
     };
 
@@ -66,18 +70,28 @@ var ServerLib = function ServerLib(web3, key, rAddress) {
     };
 
     //accessToken
-    this.GetAccessToken = function (hash, iv, address) {
+    this.GetAccessToken = async function (hash, iv, address) {
         // salt create
-        console.log('hash ', hash);
-        console.log('iv ', iv);
-        console.log('address ', address);
-        var hasBuf = Buffer.from(hash.slice(0, 2), 'hex');
-        var ivBuf =  Buffer.from(iv.slice(0, 2), 'hex');
-        var addressBuf = Buffer.from(address.slice(0, 2), 'hex');
+        var hasBuf = Buffer.from(hash.slice(2), 'hex');
+        var ivBuf =  Buffer.from(iv.slice(2), 'hex');
+        var addressBuf = Buffer.from(address.slice(2), 'hex');
         var salt = Buffer.concat([hasBuf, ivBuf, addressBuf], hasBuf.length + ivBuf.length + addressBuf.length);
-    
+
+        //update poa token seed (per 30sec)
+        var timestamp = util.UnixTime();        
+        if(seed == undefined || timestamp > seedTimestamp + seedRefreshSec){
+            var hxTimestamp = Buffer.from(timestamp.toString(16), 'hex');
+            var timestampHash = util.keccak(hxTimestamp, 256);
+            var privateKey = Buffer.from(gameKey.replace('0x',''), 'hex');
+            var signature = util.ecsignHex(timestampHash, privateKey);
+            var serialized = '0x' + signature.toString('hex');
+            var rtn = await cyprus_.GetPoATokenSeed('0x' + timestamp.toString(16), serialized);
+            seed = rtn[0];
+            seedTimestamp = timestamp;
+        }
+
         // accessToken create
-        var bAuth = new BAuth(gameKey);
+        var bAuth = new BAuth(seed);
         var accessToken = bAuth.GetAccessToken(salt).toString('base64');
 
         return accessToken;
@@ -102,6 +116,11 @@ var ServerLib = function ServerLib(web3, key, rAddress) {
     this.getGamePrivateKey = function () {
         return gameKey;
     };
+
+    this.GetPoATokenSeed = async function () {
+        return await cyprus_.GetPoATokenSeed(timestamp, signature);
+    };
+
 };
 
 module.exports = ServerLib;

@@ -22,12 +22,6 @@ var Transaction = (function () {
                 default: new buffer_1.Buffer([])
             },
             {
-                name: 'timestamp',
-                length: 16,
-                allowLess: true,
-                default: new buffer_1.Buffer([])
-            },
-            {
                 name: 'to',
                 length: 24,
                 allowLess: true,
@@ -88,7 +82,7 @@ var Transaction = (function () {
                 allowZero: true,
                 allowLess: true,
                 default: new buffer_1.Buffer([])
-            },
+            }
         ];
         // attached serialize
         util.defineProperties(this, fields, data);
@@ -99,7 +93,7 @@ var Transaction = (function () {
      * @param includeSignature - Whether or not to include the signature
      */
     Transaction.prototype.hash = function () {
-        var items = this.raw.slice(0, 9);
+        var items = this.raw.slice(0, 8);
         // create hash
         return util.rlpHash(items);
     };

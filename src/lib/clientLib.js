@@ -35,8 +35,8 @@ var ClientLib = function ClientLib(web3Cyprus, web3Poa) {
     };
 
     //poa response call
-    this.PoaResponse = function (address, accessToken) {
-        return poa_.Response(address, accessToken);
+    this.PoaResponse = function (uid, address, accessToken) {
+        return poa_.Response(uid, address, accessToken);
     };
 };
 

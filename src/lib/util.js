@@ -5,6 +5,7 @@ var secp256k1 = require('secp256k1');
 var assert = require('assert');
 var rlp = require("./rlp");
 
+const ExtraOpCode = 0x90;
 /**
  * Attempts to turn a value into a `Buffer`. As input it supports `Buffer`, `String`, `Number`, null/undefined, `BN` and other objects with a `toArray()` method.
  * @param v the value
@@ -84,6 +85,11 @@ exports.rlpEncode = function (a) {
     return rlp.encode(a);
 };
 
+exports.MakeExtras = function (a) {
+    var arr = [ExtraOpCode, a];
+    return rlp.encodeExtra(arr);
+};
+
 /**
  * Returns the ECDSA signature of a message hash.
  */
@@ -96,6 +102,21 @@ exports.ecsign = function (msgHash, privateKey) {
         v: recovery
     };
     return ret;
+};
+
+exports.ecsignHex = function (msgHash, privateKey) {    
+    var ret = exports.ecsign(msgHash, privateKey);
+
+    let rBuf = Buffer.from(ret.r); //r
+    let sBuf = Buffer.from(ret.s); //s
+    var v = ret.v.toString(16);
+    v = v.length % 2 ? "0" + v : v;
+    var vBuf =  Buffer.from(v, 'hex'); //v
+
+    const totalLength = rBuf.length + sBuf.length + vBuf.length;
+    let newBuffer = Buffer.concat([rBuf.reverse(), sBuf.reverse(), vBuf.reverse()], totalLength);
+
+    return newBuffer;
 };
 
 /**

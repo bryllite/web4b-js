@@ -5,24 +5,43 @@ function encode(input) {
     if (Array.isArray(input)) {
         let output = [];
 
-        if(input.length <= 9){
+        if(input.length <= 8){
             for (let i = 0; i < input.length; i++) {
                 output.push(encode(input[i]));
             }
         }else{
-            for (let i = 0; i < 9; i++) {
+            for (let i = 0; i < 8; i++) {
                 output.push(encode(input[i]));
             }
 
-            let inputBuf1 = toBuffer(input[9]); //r
-            let inputBuf2 = toBuffer(input[10]); //s
-            let inputBuf3 = toBuffer(input[11]); //v
+            let inputBuf1 = toBuffer(input[8]); //r
+            let inputBuf2 = toBuffer(input[9]); //s
+            let inputBuf3 = toBuffer(input[10]); //v
     
             const totalLength = inputBuf1.length + inputBuf2.length + inputBuf3.length;
             let newBuffer = Buffer.concat([inputBuf1.reverse(), inputBuf2.reverse(), inputBuf3.reverse()], totalLength);
     
             output.push(encode(newBuffer));
-            output.push(encode(input[12])); //extra
+            output.push(encode(input[11])); //extra
+        }
+
+        let buf = Buffer.concat(output);
+        return Buffer.concat([encodeLength(buf.length, 192), buf]);
+    }
+    else {
+        let inputBuf = toBuffer(input);
+        return inputBuf.length === 1 && inputBuf[0] < 128
+            ? inputBuf
+            : Buffer.concat([encodeLength(inputBuf.length, 128), inputBuf]);
+    }
+}
+
+function encodeExtra(input) {
+    if (Array.isArray(input)) {
+        let output = [];
+
+        for (let i = 0; i < input.length; i++) {
+            output.push(encodeExtra(input[i]));
         }
 
         let buf = Buffer.concat(output);
@@ -252,3 +271,4 @@ function toBuffer(v) {
 exports.decode = decode;
 exports.getLength = getLength;
 exports.encode = encode;
+exports.encodeExtra = encodeExtra;
